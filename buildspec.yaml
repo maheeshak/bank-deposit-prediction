@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 205930625619.dkr.ecr.ap-south-1.amazonaws.com
+  build:
+    commands:
+      - docker build -t bank-marketing-prediction .
+      - docker tag bank-marketing-prediction:latest 205930625619.dkr.ecr.ap-south-1.amazonaws.com/bank-marketing-prediction:latest
+  post_build:
+    commands:
+      - docker push 205930625619.dkr.ecr.ap-south-1.amazonaws.com/bank-marketing-prediction:latest
+      - echo Writing image definitions file...
+      - printf '[{"name":"bank-marketing-prediction","imageUri":"%s"}]' 505076619770.dkr.ecr.us-east-1.amazonaws.com/bank-marketing-prediction:latest > imagedefinitions.json   
+artifacts:
+  files: imagedefinitions.json
